@@ -9,23 +9,19 @@ import authenticate from "./middleware/authenticate.js";
 const app = express();
 app.use(express.json());
 
-// Connect to MongoDB
-connectDB();
-
+// Routes
 app.use("/dashboard", authenticate, dashboardRoutes);
-
-// Mount auth routes at /api/auth
 app.use("/api/auth", authRoute);
+app.use("/api/policy", policyRoute);
 
-// Mount auth routes at /api/auth
-app.use("/api/auth", authRoute);
+// ✅ Only connect to DB and start server if not in test mode
+if (process.env.NODE_ENV !== "test") {
+    connectDB(); // only run DB connection when not testing
 
-// Mount policy routes at /api/policy
-app.use("/api/policy", policyRoute); // 👈 mount the router
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`✅ Server running on port ${PORT}`);
+    });
+}
 
 export default app;
